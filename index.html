@@ -250,6 +250,7 @@
                 <input type="file" id="csvFileInput" accept=".csv">
             </div>
             <span id="fileNameDisplay" style="font-size: 12px; color: #666;">Nessun file caricato</span>
+            <button class="btn" id="btnClear" onclick="clearSavedData()" style="background:#c9302c; display:none;">Rimuovi dati</button>
         </div>
     </header>
 
@@ -316,13 +317,45 @@
             const file = e.target.files[0];
             if (!file) return;
             
-            document.getElementById('fileNameDisplay').textContent = file.name;
-            
             const reader = new FileReader();
             reader.onload = function(event) {
-                parseCSV(event.target.result);
+                const text = event.target.result;
+                try {
+                    localStorage.setItem('pdr_csv_data', text);
+                    localStorage.setItem('pdr_csv_name', file.name);
+                } catch(err) {
+                    console.warn('localStorage pieno, i dati non saranno persistiti:', err);
+                }
+                document.getElementById('fileNameDisplay').textContent = file.name;
+                document.getElementById('btnClear').style.display = 'inline-block';
+                parseCSV(text);
             };
-            reader.readAsText(file);
+            reader.readAsText(file, 'UTF-8');
+        });
+
+        function clearSavedData() {
+            localStorage.removeItem('pdr_csv_data');
+            localStorage.removeItem('pdr_csv_name');
+            csvData = [];
+            headers = [];
+            document.getElementById('fileNameDisplay').textContent = 'Nessun file caricato';
+            document.getElementById('btnClear').style.display = 'none';
+            document.getElementById('tableHeader').innerHTML = '';
+            document.getElementById('tableBody').innerHTML = '<tr><td colspan="39" style="text-align:center;padding:30px;color:#999;font-size:14px;">Carica il file CSV per visualizzare l\'analisi interattiva.</td></tr>';
+            document.getElementById('statTotali').textContent = '0';
+            document.getElementById('statAnomalie').textContent = '0';
+            document.getElementById('statRegolari').textContent = '0';
+            document.getElementById('csvFileInput').value = '';
+        }
+
+        window.addEventListener('DOMContentLoaded', function() {
+            const savedText = localStorage.getItem('pdr_csv_data');
+            const savedName = localStorage.getItem('pdr_csv_name');
+            if (savedText) {
+                document.getElementById('fileNameDisplay').textContent = (savedName || 'file CSV') + ' \u2014 caricato dalla cache';
+                document.getElementById('btnClear').style.display = 'inline-block';
+                parseCSV(savedText);
+            }
         });
 
         document.getElementById('giornoOggi').addEventListener('input', renderTable);
