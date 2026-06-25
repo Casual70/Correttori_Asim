@@ -337,10 +337,7 @@
         document.getElementById('filtroStato').addEventListener('change', renderTable);
         document.getElementById('ricercaTesto').addEventListener('input', renderTable);
 
-        const oggiReale = new Date().getDate();
-        if (oggiReale <= 31) {
-            document.getElementById('giornoOggi').value = 25;
-        }
+        document.getElementById('giornoOggi').value = 25;
 
         function parseCSV(text) {
             const lines = text.split(/\r?\n/);
@@ -389,7 +386,7 @@
             });
 
             csvData.forEach(row => {
-                let haAnomaliaFinoAggi = false;
+                let haAnomaliaFinoAdOggi = false;
 
                 for (let g = 1; g <= 31; g++) {
                     const colName = 'Giorno' + String(g).padStart(2, '0');
@@ -398,7 +395,7 @@
                         
                         if (g <= giornoOggi) {
                             if (val !== 'disponibile' && val !== 'non attivo') {
-                                haAnomaliaFinoAggi = true;
+                                haAnomaliaFinoAdOggi = true;
                             }
                         }
                     }
@@ -409,8 +406,8 @@
                     return;
                 }
 
-                if (filtroStato === 'solo-anomalie' && !haAnomaliaFinoAggi) return;
-                if (filtroStato === 'solo-regolari' && haAnomaliaFinoAggi) return;
+                if (filtroStato === 'solo-anomalie' && !haAnomaliaFinoAdOggi) return;
+                if (filtroStato === 'solo-regolari' && haAnomaliaFinoAdOggi) return;
 
                 const tr = document.createElement('tr');
                 
