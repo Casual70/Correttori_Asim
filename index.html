@@ -266,7 +266,12 @@
                 <option value="tutti">Mostra Tutti i PDR</option>
                 <option value="solo-anomalie" selected>Solo con Anomalie fino ad oggi (Non Disp./Parziale/Nessuna)</option>
                 <option value="solo-regolari">Solo Regolari (Tutti Disponibili fino ad oggi)</option>
+                <option value="anomalie-3-giorni">Anomalia negli ultimi N giorni consecutivi</option>
             </select>
+            <div id="gruppoGiorniConsecutivi" style="display:none; align-items:center; gap:6px;">
+                <label for="giorniConsecutivi">Giorni:</label>
+                <input type="number" id="giorniConsecutivi" min="1" max="31" value="3" style="width:55px;">
+            </div>
         </div>
 
         <div class="control-group">
@@ -359,8 +364,13 @@
         });
 
         document.getElementById('giornoOggi').addEventListener('input', renderTable);
-        document.getElementById('filtroStato').addEventListener('change', renderTable);
+        document.getElementById('filtroStato').addEventListener('change', function() {
+            const isConsec = this.value === 'anomalie-3-giorni';
+            document.getElementById('gruppoGiorniConsecutivi').style.display = isConsec ? 'flex' : 'none';
+            renderTable();
+        });
         document.getElementById('ricercaTesto').addEventListener('input', renderTable);
+        document.getElementById('giorniConsecutivi').addEventListener('input', renderTable);
 
         function parseCSV(text) {
             const lines = text.split(/\r?\n/);
@@ -422,11 +432,27 @@
                     }
                 }
 
+                let haAnomalia3Giorni = false;
+                if (giornoOggi >= 1) {
+                    const nGiorni = parseInt(document.getElementById('giorniConsecutivi').value) || 3;
+                    const start = Math.max(1, giornoOggi - nGiorni + 1);
+                    haAnomalia3Giorni = true;
+                    for (let g = start; g <= giornoOggi; g++) {
+                        const colName = 'Giorno' + String(g).padStart(2, '0');
+                        const val = (row[colName] || '').toLowerCase();
+                        if (val === 'disponibile' || val === 'non attivo' || val === '') {
+                            haAnomalia3Giorni = false;
+                            break;
+                        }
+                    }
+                }
+
                 const testoRiga = `${row['Codice Utenza']} ${row['Descrizione']} ${row['Comune']}`.toLowerCase();
                 if (ricercaTesto && !testoRiga.includes(ricercaTesto)) return;
 
                 if (filtroStato === 'solo-anomalie' && !haAnomaliaFinoAdOggi) return;
                 if (filtroStato === 'solo-regolari' && haAnomaliaFinoAdOggi) return;
+                if (filtroStato === 'anomalie-3-giorni' && !haAnomalia3Giorni) return;
 
                 const tr = document.createElement('tr');
                 
