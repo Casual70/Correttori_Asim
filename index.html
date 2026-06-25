@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analisi Letture PDR</title>
+    <style>
+        :root {
+            --primary: #2b5797;
+            --primary-dark: #1e3a67;
+            --bg: #f4f6f9;
+            --surface: #ffffff;
+            --text: #333333;
+            --border: #dddddd;
+            
+            --color-disponibile: #e2f0d9;
+            --color-parziale: #fff2cc;
+            --color-nessuna: #fce4d6;
+            --color-non-attivo: #f2f2f2;
+            --color-anomalia: #f8cecc;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        header {
+            background-color: var(--surface);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: var(--primary-dark);
+        }
+
+        .upload-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            display: inline-block;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .file-input-wrapper input[type=file] {
+            font-size: 100px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .controls {
+            background-color: var(--surface);
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        select, input[type=number], input[type=text] {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 14px;
+            background-color: white;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border-left: 4px solid var(--primary);
+            text-align: center;
+        }
+
+        .stat-card.alert {
+            border-left-color: #d9534f;
+        }
+
+        .stat-val {
+            font-size: 24px;
+            font-weight: bold;
+            color: #111;
+            margin-top: 5px;
+        }
+
+        .table-container {
+            background-color: var(--surface);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            overflow-x: auto;
+            max-height: 650px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 8px 10px;
+            border: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            color: #495057;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            box-shadow: 0 1px 0 var(--border);
+        }
+
+        th.sticky-col, td.sticky-col {
+            position: sticky;
+            left: 0;
+            background-color: #f8f9fa;
+            z-index: 5;
+            box-shadow: 1px 0 0 var(--border);
+        }
+        
+        th.sticky-col-2, td.sticky-col-2 {
+            position: sticky;
+            left: 110px;
+            background-color: #f8f9fa;
+            z-index: 5;
+            box-shadow: 1px 0 0 var(--border);
+        }
+
+        tr:hover td {
+            background-color: rgba(0,0,0,0.02);
+        }
+
+        .cell-disponibile { background-color: var(--color-disponibile) !important; }
+        .cell-parziale { background-color: var(--color-parziale) !important; font-weight: bold; }
+        .cell-nessuna { background-color: var(--color-nessuna) !important; font-weight: bold; }
+        .cell-non-attivo { background-color: var(--color-non-attivo) !important; color: #777; }
+        .cell-anomalia { background-color: var(--color-anomalia) !important; font-weight: bold; color: #b71c1c; }
+        .cell-futuro { background-color: #ffffff !important; color: #ccc; font-style: italic; }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        .badge-anomalia { background-color: var(--color-anomalia); color: #b71c1c; }
+
+        .hidden { display: none !important; }
+        
+        .legend {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            background: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .legend-box {
+            width: 16px;
+            height: 16px;
+            border: 1px solid var(--border);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Monitoraggio Stato Letture Giornaliere PDR</h1>
+        <div class="upload-section">
+            <div class="file-input-wrapper">
+                <button class="btn">Carica File CSV</button>
+                <input type="file" id="csvFileInput" accept=".csv">
+            </div>
+            <span id="fileNameDisplay" style="font-size: 14px; color: #666;">Nessun file caricato</span>
+        </div>
+    </header>
+
+    <div class="controls">
+        <div class="control-group">
+            <label for="giornoOggi">Giorno Corrente (Oggi):</label>
+            <input type="number" id="giornoOggi" min="1" max="31" value="25" style="width: 70px;">
+        </div>
+
+        <div class="control-group">
+            <label for="filtroStato">Filtra PDR:</label>
+            <select id="filtroStato">
+                <option value="tutti">Mostra Tutti i PDR</option>
+                <option value="solo-anomalie" selected>Solo con Anomalie fino ad oggi (Non Disp./Parziale/Nessuna)</option>
+                <option value="solo-regolari">Solo Regolari (Tutti Disponibili fino ad oggi)</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label for="ricercaTesto">Cerca (PDR / Comune / Desc.):</label>
+            <input type="text" id="ricercaTesto" placeholder="Inserisci testo...">
+        </div>
+    </div>
+
+    <div class="legend">
+        <div class="legend-item"><div class="legend-box cell-disponibile"></div> Disponibile</div>
+        <div class="legend-item"><div class="legend-box cell-parziale"></div> Parziale</div>
+        <div class="legend-item"><div class="legend-box cell-nessuna"></div> Nessuna</div>
+        <div class="legend-item"><div class="legend-box cell-non-attivo"></div> Non attivo</div>
+        <div class="legend-item"><div class="legend-box cell-anomalia"></div> Anomalia (fino a Oggi)</div>
+        <div class="legend-item"><div class="legend-box cell-futuro"></div> Giorno Futuro (Ignorato)</div>
+    </div>
+
+    <div class="stats">
+        <div class="stat-card">
+            <div>PDR Totali</div>
+            <div class="stat-val" id="statTotali">0</div>
+        </div>
+        <div class="stat-card alert">
+            <div>PDR con Anomalie (Fino a Oggi)</div>
+            <div class="stat-val" id="statAnomalie" style="color: #c9302c;">0</div>
+        </div>
+        <div class="stat-card">
+            <div>PDR Regolari</div>
+            <div class="stat-val" id="statRegolari" style="color: #449d44;">0</div>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table id="pdrTable">
+            <thead>
+                <tr id="tableHeader">
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <tr>
+                    <td colspan="39" style="text-align: center; padding: 40px; color: #999; font-size: 16px;">
+                        Carica il file CSV per visualizzare l'analisi interattiva.
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        let csvData = [];
+        let headers = [];
+
+        document.getElementById('csvFileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            document.getElementById('fileNameDisplay').textContent = file.name;
+            
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                parseCSV(event.target.result);
+            };
+            reader.readAsText(file);
+        });
+
+        document.getElementById('giornoOggi').addEventListener('input', renderTable);
+        document.getElementById('filtroStato').addEventListener('change', renderTable);
+        document.getElementById('ricercaTesto').addEventListener('input', renderTable);
+
+        function parseCSV(text) {
+            const lines = text.split(/\r?\n/);
+            csvData = [];
+            headers = [];
+            
+            if (lines.length === 0 || lines[0].trim() === '') return;
+            
+            headers = lines[0].split(';').map(h => h.trim().replace(/^"|"$/g, ''));
+            
+            for (let i = 1; i < lines.length; i++) {
+                if (lines[i].trim() === '') continue;
+                
+                const cells = lines[i].split(';').map(c => c.trim().replace(/^"|"$/g, ''));
+                if (cells.length === headers.length) {
+                    let rowObj = {};
+                    headers.forEach((header, index) => {
+                        rowObj[header] = cells[index];
+                    });
+                    csvData.push(rowObj);
+                }
+            }
+            
+            renderTable();
+        }
+
+        function renderTable() {
+            if (csvData.length === 0) return;
+
+            const giornoOggi = parseInt(document.getElementById('giornoOggi').value) || 31;
+            const filtroStato = document.getElementById('filtroStato').value;
+            const ricercaTesto = document.getElementById('ricercaTesto').value.toLowerCase();
+
+            const headerRow = document.getElementById('tableHeader');
+            const tbody = document.getElementById('tableBody');
+            
+            headerRow.innerHTML = '';
+            tbody.innerHTML = '';
+
+            headers.forEach((h, idx) => {
+                const th = document.createElement('th');
+                th.textContent = h;
+                if (idx === 1) th.classList.add('sticky-col');
+                if (idx === 2) th.classList.add('sticky-col-2');
+                headerRow.appendChild(th);
+            });
+
+            csvData.forEach(row => {
+                let haAnomaliaFinoAdOggi = false;
+
+                for (let g = 1; g <= 31; g++) {
+                    const colName = 'Giorno' + String(g).padStart(2, '0');
+                    if (row[colName]) {
+                        const val = row[colName].toLowerCase();
+                        
+                        if (g <= giornoOggi) {
+                            if (val !== 'disponibile' && val !== 'non attivo') {
+                                haAnomaliaFinoAdOggi = true;
+                            }
+                        }
+                    }
+                }
+
+                const testoRiga = `${row['Codice Utenza']} ${row['Descrizione']} ${row['Comune']}`.toLowerCase();
+                if (ricercaTesto && !testoRiga.includes(ricercaTesto)) {
+                    return;
+                }
+
+                if (filtroStato === 'solo-anomalie' && !haAnomaliaFinoAdOggi) return;
+                if (filtroStato === 'solo-regolari' && haAnomaliaFinoAdOggi) return;
+
+                const tr = document.createElement('tr');
+                
+                headers.forEach((h, idx) => {
+                    const td = document.createElement('td');
+                    const val = row[h] || '';
+                    td.textContent = val;
+                    
+                    if (idx === 1) td.classList.add('sticky-col');
+                    if (idx === 2) td.classList.add('sticky-col-2');
+
+                    if (h.startsWith('Giorno')) {
+                        const giornoNum = parseInt(h.replace('Giorno', ''));
+                        const valLower = val.toLowerCase();
+
+                        if (giornoNum > giornoOggi) {
+                            td.classList.add('cell-futuro');
+                        } else {
+                            if (valLower === 'disponibile') {
+                                td.classList.add('cell-disponibile');
+                            } else if (valLower === 'non attivo') {
+                                td.classList.add('cell-non-attivo');
+                            } else if (valLower === 'parziale') {
+                                td.classList.add('cell-anomalia');
+                                td.title = 'Stato Parziale prima di oggi';
+                            } else if (valLower === 'nessuna') {
+                                td.classList.add('cell-anomalia');
+                                td.title = 'Nessuna lettura prima di oggi';
+                            } else {
+                                td.classList.add('cell-anomalia');
+                            }
+                        }
+                    }
+                    
+                    tr.appendChild(td);
+                });
+
+                tbody.appendChild(tr);
+            });
+
+            let globTot = 0, globAnom = 0, globReg = 0;
+            csvData.forEach(row => {
+                const testoRiga = `${row['Codice Utenza']} ${row['Descrizione']} ${row['Comune']}`.toLowerCase();
+                if (ricercaTesto && !testoRiga.includes(ricercaTesto)) return;
+
+                globTot++;
+                let haAnom = false;
+                for (let g = 1; g <= 31; g++) {
+                    const colName = 'Giorno' + String(g).padStart(2, '0');
+                    if (row[colName] && g <= giornoOggi) {
+                        const val = row[colName].toLowerCase();
+                        if (val !== 'disponibile' && val !== 'non attivo') haAnom = true;
+                    }
+                }
+                if (haAnom) globAnom++; else globReg++;
+            });
+
+            document.getElementById('statTotali').textContent = globTot;
+            document.getElementById('statAnomalie').textContent = globAnom;
+            document.getElementById('statRegolari').textContent = globReg;
+
+            if (globTot === 0 || tbody.children.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="${headers.length}" style="text-align: center; padding: 30px; color: #999;">Nessun PDR corrisponde ai criteri di filtro selezionati.</td></tr>`;
+            }
+        }
+    </script>
+</body>
+</html>
