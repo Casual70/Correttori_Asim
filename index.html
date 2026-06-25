@@ -337,8 +337,6 @@
         document.getElementById('filtroStato').addEventListener('change', renderTable);
         document.getElementById('ricercaTesto').addEventListener('input', renderTable);
 
-        document.getElementById('giornoOggi').value = 25;
-
         function parseCSV(text) {
             const lines = text.split(/\r?\n/);
             csvData = [];
