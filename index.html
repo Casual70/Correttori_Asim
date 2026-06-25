@@ -12,12 +12,7 @@
             --surface: #ffffff;
             --text: #333333;
             --border: #dddddd;
-            
-            --color-disponibile: #e2f0d9;
-            --color-parziale: #fff2cc;
-            --color-nessuna: #fce4d6;
-            --color-non-attivo: #f2f2f2;
-            --color-anomalia: #f8cecc;
+            --green-indicator: #28a745;
         }
 
         * {
@@ -30,32 +25,33 @@
         body {
             background-color: var(--bg);
             color: var(--text);
-            padding: 20px;
-            line-height: 1.5;
+            padding: 14px;
+            line-height: 1.35;
+            font-size: 13px;
         }
 
         header {
             background-color: var(--surface);
-            padding: 20px;
+            padding: 12px 14px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
+            margin-bottom: 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 10px;
         }
 
         h1 {
-            font-size: 24px;
+            font-size: 18px;
             color: var(--primary-dark);
         }
 
         .upload-section {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
         }
 
         .file-input-wrapper {
@@ -67,13 +63,14 @@
         .btn {
             background-color: var(--primary);
             color: white;
-            padding: 10px 20px;
+            padding: 7px 12px;
             border-radius: 4px;
-            font-weight: bold;
+            font-weight: 600;
             cursor: pointer;
             border: none;
             display: inline-block;
             transition: background 0.2s;
+            font-size: 12px;
         }
 
         .btn:hover {
@@ -91,12 +88,12 @@
 
         .controls {
             background-color: var(--surface);
-            padding: 15px 20px;
+            padding: 10px 14px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             display: flex;
-            gap: 20px;
+            gap: 14px;
             align-items: center;
             flex-wrap: wrap;
         }
@@ -104,36 +101,37 @@
         .control-group {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         label {
             font-weight: 600;
-            font-size: 14px;
+            font-size: 12px;
         }
 
         select, input[type=number], input[type=text] {
-            padding: 8px 12px;
+            padding: 6px 8px;
             border: 1px solid var(--border);
             border-radius: 4px;
-            font-size: 14px;
+            font-size: 12px;
             background-color: white;
         }
 
         .stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 10px;
+            margin-bottom: 10px;
         }
 
         .stat-card {
             background: var(--surface);
-            padding: 15px;
+            padding: 10px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             border-left: 4px solid var(--primary);
             text-align: center;
+            font-size: 12px;
         }
 
         .stat-card.alert {
@@ -141,10 +139,10 @@
         }
 
         .stat-val {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: bold;
             color: #111;
-            margin-top: 5px;
+            margin-top: 2px;
         }
 
         .table-container {
@@ -152,7 +150,7 @@
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             overflow-x: auto;
-            max-height: 650px;
+            max-height: 700px;
             overflow-y: auto;
             position: relative;
         }
@@ -160,14 +158,15 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 13px;
+            font-size: 11px;
             text-align: left;
         }
 
         th, td {
-            padding: 8px 10px;
+            padding: 4px 6px;
             border: 1px solid var(--border);
             white-space: nowrap;
+            height: 24px;
         }
 
         th {
@@ -186,59 +185,58 @@
             background-color: #f8f9fa;
             z-index: 5;
             box-shadow: 1px 0 0 var(--border);
+            min-width: 100px;
         }
         
         th.sticky-col-2, td.sticky-col-2 {
             position: sticky;
-            left: 110px;
+            left: 100px;
             background-color: #f8f9fa;
             z-index: 5;
             box-shadow: 1px 0 0 var(--border);
+            min-width: 120px;
         }
 
         tr:hover td {
             background-color: rgba(0,0,0,0.02);
         }
 
-        .cell-disponibile { background-color: var(--color-disponibile) !important; }
-        .cell-parziale { background-color: var(--color-parziale) !important; font-weight: bold; }
-        .cell-nessuna { background-color: var(--color-nessuna) !important; font-weight: bold; }
-        .cell-non-attivo { background-color: var(--color-non-attivo) !important; color: #777; }
-        .cell-anomalia { background-color: var(--color-anomalia) !important; font-weight: bold; color: #b71c1c; }
-        .cell-futuro { background-color: #ffffff !important; color: #ccc; font-style: italic; }
-
-        .badge {
-            display: inline-block;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: bold;
-        }
-        .badge-anomalia { background-color: var(--color-anomalia); color: #b71c1c; }
-
-        .hidden { display: none !important; }
-        
         .legend {
             display: flex;
-            gap: 15px;
+            gap: 10px;
             flex-wrap: wrap;
             background: white;
-            padding: 10px 15px;
+            padding: 8px 12px;
             border-radius: 8px;
-            margin-bottom: 15px;
-            font-size: 13px;
+            margin-bottom: 10px;
+            font-size: 12px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
+
         .legend-item {
             display: flex;
             align-items: center;
             gap: 5px;
         }
-        .legend-box {
-            width: 16px;
-            height: 16px;
-            border: 1px solid var(--border);
-            border-radius: 3px;
+
+        .dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            display: inline-block;
+            background: transparent;
+        }
+
+        .dot-available {
+            background: var(--green-indicator);
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.08);
+        }
+
+        .day-col {
+            text-align: center;
+            min-width: 26px;
+            width: 26px;
+            padding: 2px !important;
         }
     </style>
 </head>
@@ -251,14 +249,14 @@
                 <button class="btn">Carica File CSV</button>
                 <input type="file" id="csvFileInput" accept=".csv">
             </div>
-            <span id="fileNameDisplay" style="font-size: 14px; color: #666;">Nessun file caricato</span>
+            <span id="fileNameDisplay" style="font-size: 12px; color: #666;">Nessun file caricato</span>
         </div>
     </header>
 
     <div class="controls">
         <div class="control-group">
             <label for="giornoOggi">Giorno Corrente (Oggi):</label>
-            <input type="number" id="giornoOggi" min="1" max="31" value="25" style="width: 70px;">
+            <input type="number" id="giornoOggi" min="1" max="31" value="25" style="width: 60px;">
         </div>
 
         <div class="control-group">
@@ -277,12 +275,7 @@
     </div>
 
     <div class="legend">
-        <div class="legend-item"><div class="legend-box cell-disponibile"></div> Disponibile</div>
-        <div class="legend-item"><div class="legend-box cell-parziale"></div> Parziale</div>
-        <div class="legend-item"><div class="legend-box cell-nessuna"></div> Nessuna</div>
-        <div class="legend-item"><div class="legend-box cell-non-attivo"></div> Non attivo</div>
-        <div class="legend-item"><div class="legend-box cell-anomalia"></div> Anomalia (fino a Oggi)</div>
-        <div class="legend-item"><div class="legend-box cell-futuro"></div> Giorno Futuro (Ignorato)</div>
+        <div class="legend-item"><span class="dot dot-available"></span> Disponibile</div>
     </div>
 
     <div class="stats">
@@ -303,12 +296,11 @@
     <div class="table-container">
         <table id="pdrTable">
             <thead>
-                <tr id="tableHeader">
-                </tr>
+                <tr id="tableHeader"></tr>
             </thead>
             <tbody id="tableBody">
                 <tr>
-                    <td colspan="39" style="text-align: center; padding: 40px; color: #999; font-size: 16px;">
+                    <td colspan="39" style="text-align: center; padding: 30px; color: #999; font-size: 14px;">
                         Carica il file CSV per visualizzare l'analisi interattiva.
                     </td>
                 </tr>
@@ -380,6 +372,7 @@
                 th.textContent = h;
                 if (idx === 1) th.classList.add('sticky-col');
                 if (idx === 2) th.classList.add('sticky-col-2');
+                if (h.startsWith('Giorno')) th.classList.add('day-col');
                 headerRow.appendChild(th);
             });
 
@@ -390,19 +383,14 @@
                     const colName = 'Giorno' + String(g).padStart(2, '0');
                     if (row[colName]) {
                         const val = row[colName].toLowerCase();
-                        
-                        if (g <= giornoOggi) {
-                            if (val !== 'disponibile' && val !== 'non attivo') {
-                                haAnomaliaFinoAdOggi = true;
-                            }
+                        if (g <= giornoOggi && val !== 'disponibile' && val !== 'non attivo') {
+                            haAnomaliaFinoAdOggi = true;
                         }
                     }
                 }
 
                 const testoRiga = `${row['Codice Utenza']} ${row['Descrizione']} ${row['Comune']}`.toLowerCase();
-                if (ricercaTesto && !testoRiga.includes(ricercaTesto)) {
-                    return;
-                }
+                if (ricercaTesto && !testoRiga.includes(ricercaTesto)) return;
 
                 if (filtroStato === 'solo-anomalie' && !haAnomaliaFinoAdOggi) return;
                 if (filtroStato === 'solo-regolari' && haAnomaliaFinoAdOggi) return;
@@ -412,32 +400,21 @@
                 headers.forEach((h, idx) => {
                     const td = document.createElement('td');
                     const val = row[h] || '';
-                    td.textContent = val;
-                    
+                    const valLower = val.toLowerCase();
+
                     if (idx === 1) td.classList.add('sticky-col');
                     if (idx === 2) td.classList.add('sticky-col-2');
 
                     if (h.startsWith('Giorno')) {
-                        const giornoNum = parseInt(h.replace('Giorno', ''));
-                        const valLower = val.toLowerCase();
+                        td.classList.add('day-col');
 
-                        if (giornoNum > giornoOggi) {
-                            td.classList.add('cell-futuro');
+                        if (valLower === 'disponibile') {
+                            td.innerHTML = '<span class="dot dot-available" title="Disponibile"></span>';
                         } else {
-                            if (valLower === 'disponibile') {
-                                td.classList.add('cell-disponibile');
-                            } else if (valLower === 'non attivo') {
-                                td.classList.add('cell-non-attivo');
-                            } else if (valLower === 'parziale') {
-                                td.classList.add('cell-anomalia');
-                                td.title = 'Stato Parziale prima di oggi';
-                            } else if (valLower === 'nessuna') {
-                                td.classList.add('cell-anomalia');
-                                td.title = 'Nessuna lettura prima di oggi';
-                            } else {
-                                td.classList.add('cell-anomalia');
-                            }
+                            td.textContent = '';
                         }
+                    } else {
+                        td.textContent = val;
                     }
                     
                     tr.appendChild(td);
@@ -468,7 +445,7 @@
             document.getElementById('statRegolari').textContent = globReg;
 
             if (globTot === 0 || tbody.children.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="${headers.length}" style="text-align: center; padding: 30px; color: #999;">Nessun PDR corrisponde ai criteri di filtro selezionati.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="${headers.length}" style="text-align: center; padding: 24px; color: #999;">Nessun PDR corrisponde ai criteri di filtro selezionati.</td></tr>`;
             }
         }
     </script>
