@@ -377,7 +377,23 @@
 
         function exportToExcel() {
             if (filteredData.length === 0) return;
-            const wsData = [headers, ...filteredData.map(row => headers.map(h => row[h] || ''))];
+            const giornoOggi = parseInt(document.getElementById('giornoOggi').value) || 31;
+            const exportHeaders = headers.filter(h => h !== 'Azienda' && !h.startsWith('Giorno'));
+            exportHeaders.push('Giorni mancato collegamento');
+            const wsData = [
+                exportHeaders,
+                ...filteredData.map(row => {
+                    const vals = exportHeaders.slice(0, -1).map(h => row[h] || '');
+                    let conta = 0;
+                    for (let g = 1; g <= giornoOggi; g++) {
+                        const colName = 'Giorno' + String(g).padStart(2, '0');
+                        const val = (row[colName] || '').toLowerCase();
+                        if (val !== 'disponibile' && val !== 'non attivo' && val !== '') conta++;
+                    }
+                    vals.push(conta);
+                    return vals;
+                })
+            ];
             const wb = XLSX.utils.book_new();
             const ws = XLSX.utils.aoa_to_sheet(wsData);
             XLSX.utils.book_append_sheet(wb, ws, 'PDR Filtrati');
