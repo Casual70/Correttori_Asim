@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Analisi Letture PDR</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root {
             --primary: #2b5797;
@@ -251,6 +252,7 @@
             </div>
             <span id="fileNameDisplay" style="font-size: 12px; color: #666;">Nessun file caricato</span>
             <button class="btn" id="btnClear" onclick="clearSavedData()" style="background:#c9302c; display:none;">Rimuovi dati</button>
+            <button class="btn" id="btnExport" onclick="exportToExcel()" style="background:#217346; display:none;">Esporta Excel</button>
         </div>
     </header>
 
@@ -277,6 +279,11 @@
         <div class="control-group">
             <label for="ricercaTesto">Cerca (PDR / Comune / Desc.):</label>
             <input type="text" id="ricercaTesto" placeholder="Inserisci testo...">
+        </div>
+
+        <div class="control-group">
+            <label for="filtroComune">Comune:</label>
+            <select id="filtroComune"><option value="">Tutti</option></select>
         </div>
     </div>
 
@@ -317,6 +324,7 @@
     <script>
         let csvData = [];
         let headers = [];
+        let filteredData = [];
 
         document.getElementById('csvFileInput').addEventListener('change', function(e) {
             const file = e.target.files[0];
@@ -337,6 +345,10 @@
             };
             reader.readAsText(file, 'UTF-8');
         });
+
+        function showExportBtn() {
+            document.getElementById('btnExport').style.display = csvData.length ? 'inline-block' : 'none';
+        }
 
         function clearSavedData() {
             localStorage.removeItem('pdr_csv_data');
@@ -363,6 +375,16 @@
             }
         });
 
+        function exportToExcel() {
+            if (filteredData.length === 0) return;
+            const wsData = [headers, ...filteredData.map(row => headers.map(h => row[h] || ''))];
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+            XLSX.utils.book_append_sheet(wb, ws, 'PDR Filtrati');
+            const today = new Date().toISOString().slice(0, 10);
+            XLSX.writeFile(wb, `PDR_export_${today}.xlsx`);
+        }
+
         document.getElementById('giornoOggi').addEventListener('input', renderTable);
         document.getElementById('filtroStato').addEventListener('change', function() {
             const isConsec = this.value === 'anomalie-3-giorni';
@@ -371,6 +393,7 @@
         });
         document.getElementById('ricercaTesto').addEventListener('input', renderTable);
         document.getElementById('giorniConsecutivi').addEventListener('input', renderTable);
+        document.getElementById('filtroComune').addEventListener('change', renderTable);
 
         function parseCSV(text) {
             const lines = text.split(/\r?\n/);
@@ -394,7 +417,20 @@
                 }
             }
             
+            populateComuneSelect();
             renderTable();
+        }
+
+        function populateComuneSelect() {
+            const comuni = [...new Set(csvData.map(r => r['Comune'] || '').filter(Boolean))].sort();
+            const sel = document.getElementById('filtroComune');
+            sel.innerHTML = '<option value="">Tutti</option>';
+            comuni.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c;
+                opt.textContent = c;
+                sel.appendChild(opt);
+            });
         }
 
         function renderTable() {
@@ -403,16 +439,19 @@
             const giornoOggi = parseInt(document.getElementById('giornoOggi').value) || 31;
             const filtroStato = document.getElementById('filtroStato').value;
             const ricercaTesto = document.getElementById('ricercaTesto').value.toLowerCase();
+            const filtroComune = document.getElementById('filtroComune').value.toLowerCase();
 
             const headerRow = document.getElementById('tableHeader');
             const tbody = document.getElementById('tableBody');
             
             headerRow.innerHTML = '';
             tbody.innerHTML = '';
+            filteredData = [];
 
             headers.forEach((h, idx) => {
+                if (h === 'Azienda') return;
                 const th = document.createElement('th');
-                th.textContent = h;
+                th.textContent = h.startsWith('Giorno') ? h.replace('Giorno', '') : h;
                 if (idx === 1) th.classList.add('sticky-col');
                 if (idx === 2) th.classList.add('sticky-col-2');
                 if (h.startsWith('Giorno')) th.classList.add('day-col');
@@ -454,9 +493,11 @@
                 if (filtroStato === 'solo-regolari' && haAnomaliaFinoAdOggi) return;
                 if (filtroStato === 'anomalie-3-giorni' && !haAnomalia3Giorni) return;
 
+                filteredData.push(row);
                 const tr = document.createElement('tr');
                 
                 headers.forEach((h, idx) => {
+                    if (h === 'Azienda') return;
                     const td = document.createElement('td');
                     const val = row[h] || '';
                     const valLower = val.toLowerCase();
@@ -486,6 +527,7 @@
             csvData.forEach(row => {
                 const testoRiga = `${row['Codice Utenza']} ${row['Descrizione']} ${row['Comune']}`.toLowerCase();
                 if (ricercaTesto && !testoRiga.includes(ricercaTesto)) return;
+                if (filtroComune && (row['Comune'] || '').toLowerCase() !== filtroComune) return;
 
                 globTot++;
                 let haAnom = false;
@@ -506,6 +548,8 @@
             if (globTot === 0 || tbody.children.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="${headers.length}" style="text-align: center; padding: 24px; color: #999;">Nessun PDR corrisponde ai criteri di filtro selezionati.</td></tr>`;
             }
+
+            document.getElementById('btnExport').style.display = filteredData.length ? 'inline-block' : 'none';
         }
     </script>
 </body>
