@@ -462,13 +462,20 @@
         }
 
         function populateComuneSelect() {
-            const comuni = [...new Set(csvData.map(r => r['Comune'] || '').filter(Boolean))].sort();
+            // Deduplicazione case-insensitive: mappa lowercase → prima occorrenza originale
+            const comuniMap = new Map();
+            csvData.forEach(r => {
+                const raw = (r['Comune'] || '').trim();
+                if (raw && !comuniMap.has(raw.toLowerCase())) {
+                    comuniMap.set(raw.toLowerCase(), raw);
+                }
+            });
             const sel = document.getElementById('filtroComune');
             sel.innerHTML = '<option value="">Tutti</option>';
-            comuni.forEach(c => {
+            [...comuniMap.keys()].sort().forEach(key => {
                 const opt = document.createElement('option');
-                opt.value = c;
-                opt.textContent = c;
+                opt.value = key;           // lowercase → confronto sicuro
+                opt.textContent = comuniMap.get(key);  // testo originale per leggibilità
                 sel.appendChild(opt);
             });
         }
