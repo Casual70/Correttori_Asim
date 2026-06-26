@@ -300,6 +300,11 @@
             <label for="filtroComune">Comune:</label>
             <select id="filtroComune"><option value="">Tutti</option></select>
         </div>
+
+        <div class="control-group" style="background:#fff8e1; border:1px solid #f0ad4e; border-radius:4px; padding:6px 10px;">
+            <input type="checkbox" id="escludioffline" checked style="cursor:pointer; width:14px; height:14px;">
+            <label for="escludioffline" style="cursor:pointer; color:#856404;">Escludi PDR sempre non disponibili (nessun giorno disponibile nel mese)</label>
+        </div>
     </div>
 
     <div class="legend">
@@ -428,6 +433,7 @@
         document.getElementById('ricercaTesto').addEventListener('input', renderTable);
         document.getElementById('giorniConsecutivi').addEventListener('input', renderTable);
         document.getElementById('filtroComune').addEventListener('change', renderTable);
+        document.getElementById('escludioffline').addEventListener('change', renderTable);
 
         function parseCSV(text) {
             const lines = text.split(/\r?\n/);
@@ -474,6 +480,7 @@
             const filtroStato = document.getElementById('filtroStato').value;
             const ricercaTesto = document.getElementById('ricercaTesto').value.toLowerCase();
             const filtroComune = document.getElementById('filtroComune').value.toLowerCase();
+            const escludiOffline = document.getElementById('escludioffline').checked;
 
             const headerRow = document.getElementById('tableHeader');
             const tbody = document.getElementById('tableBody');
