@@ -529,6 +529,18 @@
 
                 const testoRiga = `${row['Codice Utenza']} ${row['Descrizione']} ${row['Comune']}`.toLowerCase();
                 if (ricercaTesto && !testoRiga.includes(ricercaTesto)) return;
+                if (filtroComune && (row['Comune'] || '').toLowerCase() !== filtroComune) return;
+
+                if (escludiOffline) {
+                    let maiDisponibile = true;
+                    for (let g = 1; g <= 31; g++) {
+                        if ((row['Giorno' + String(g).padStart(2, '0')] || '').toLowerCase() === 'disponibile') {
+                            maiDisponibile = false;
+                            break;
+                        }
+                    }
+                    if (maiDisponibile) return;
+                }
 
                 if (filtroStato === 'solo-anomalie' && !haAnomaliaFinoAdOggi) return;
                 if (filtroStato === 'solo-regolari' && haAnomaliaFinoAdOggi) return;
@@ -579,6 +591,16 @@
                 const testoRiga = `${row['Codice Utenza']} ${row['Descrizione']} ${row['Comune']}`.toLowerCase();
                 if (ricercaTesto && !testoRiga.includes(ricercaTesto)) return;
                 if (filtroComune && (row['Comune'] || '').toLowerCase() !== filtroComune) return;
+
+                if (escludiOffline) {
+                    let maiDisponibile = true;
+                    for (let g = 1; g <= 31; g++) {
+                        if ((row['Giorno' + String(g).padStart(2, '0')] || '').toLowerCase() === 'disponibile') {
+                            maiDisponibile = false; break;
+                        }
+                    }
+                    if (maiDisponibile) return;
+                }
 
                 globTot++;
                 let haAnom = false;
