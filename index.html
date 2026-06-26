@@ -233,6 +233,21 @@
             box-shadow: 0 0 0 1px rgba(0,0,0,0.08);
         }
 
+        .dot-partial {
+            background: #f0ad4e;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.08);
+        }
+
+        .dot-unavailable {
+            background: #d9534f;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.08);
+        }
+
+        .dot-future {
+            background: #cccccc;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.08);
+        }
+
         .day-col {
             text-align: center;
             min-width: 26px;
@@ -289,6 +304,9 @@
 
     <div class="legend">
         <div class="legend-item"><span class="dot dot-available"></span> Disponibile</div>
+        <div class="legend-item"><span class="dot dot-partial"></span> Parziale</div>
+        <div class="legend-item"><span class="dot dot-unavailable"></span> Non Disponibile</div>
+        <div class="legend-item"><span class="dot dot-future"></span> Futuro / Non attivo</div>
     </div>
 
     <div class="stats">
@@ -523,9 +541,19 @@
 
                     if (h.startsWith('Giorno')) {
                         td.classList.add('day-col');
-
+                        const dayNum = parseInt(h.replace('Giorno', ''));
                         if (valLower === 'disponibile') {
                             td.innerHTML = '<span class="dot dot-available" title="Disponibile"></span>';
+                        } else if (valLower === 'parziale') {
+                            td.innerHTML = dayNum <= giornoOggi
+                                ? '<span class="dot dot-partial" title="Parziale"></span>'
+                                : '<span class="dot dot-future" title="Parziale (futuro)"></span>';
+                        } else if (valLower === 'non attivo') {
+                            td.innerHTML = '<span class="dot dot-future" title="Non Attivo"></span>';
+                        } else if (valLower !== '') {
+                            td.innerHTML = dayNum <= giornoOggi
+                                ? '<span class="dot dot-unavailable" title="' + val + '"></span>'
+                                : '<span class="dot dot-future" title="' + val + ' (futuro)"></span>';
                         } else {
                             td.textContent = '';
                         }
